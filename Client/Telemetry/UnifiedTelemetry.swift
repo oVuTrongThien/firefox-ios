@@ -44,9 +44,9 @@ class UnifiedTelemetry {
             return outputDict
         }
 
-       Telemetry.default.beforeSerializePing(pingType: MobileEventPingBuilder.PingType) { (inputDict) -> [String : Any?] in
+       Telemetry.default.beforeSerializePing(pingType: MobileEventPingBuilder.PingType) { (inputDict) -> [String: Any?] in
            var outputDict = inputDict
-           var settings: [String : Any?] = inputDict["settings"] as? [String : Any?] ?? [:]
+           var settings: [String: Any?] = inputDict["settings"] as? [String: Any?] ?? [:]
 
            let searchEngines = SearchEngines(prefs: profile.prefs, files: profile.files)
            settings["defaultSearchEngine"] = searchEngines.defaultEngine.engineID ?? "custom"
@@ -128,11 +128,11 @@ extension UnifiedTelemetry {
         case topTabs = "top-tabs"
     }
 
-    public static func recordEvent(category: EventCategory, method: EventMethod, object: EventObject, value: EventValue, extras: [String : Any?]? = nil) {
+    public static func recordEvent(category: EventCategory, method: EventMethod, object: EventObject, value: EventValue, extras: [String: Any?]? = nil) {
         Telemetry.default.recordEvent(category: category.rawValue, method: method.rawValue, object: object.rawValue, value: value.rawValue, extras: extras)
     }
 
-    public static func recordEvent(category: EventCategory, method: EventMethod, object: EventObject, value: String? = nil, extras: [String : Any?]? = nil) {
+    public static func recordEvent(category: EventCategory, method: EventMethod, object: EventObject, value: String? = nil, extras: [String: Any?]? = nil) {
         Telemetry.default.recordEvent(category: category.rawValue, method: method.rawValue, object: object.rawValue, value: value, extras: extras)
     }
 }

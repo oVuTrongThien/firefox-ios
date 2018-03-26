@@ -816,7 +816,6 @@ fileprivate class TabManagerDataSource: NSObject, UICollectionViewDataSource {
     }
 }
 
-
 @available(iOS 11.0, *)
 extension TabManagerDataSource: UICollectionViewDragDelegate {
     func collectionView(_ collectionView: UICollectionView, dragSessionWillBegin session: UIDragSession) {
@@ -847,7 +846,7 @@ extension TabManagerDataSource: UICollectionViewDragDelegate {
         var itemProvider: NSItemProvider
         if url != nil, !(url?.isLocal ?? true) {
             itemProvider = NSItemProvider(contentsOf: url) ?? NSItemProvider()
-        }  else {
+        } else {
             itemProvider = NSItemProvider()
         }
 
