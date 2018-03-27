@@ -17,14 +17,11 @@ class FindInPageTests: BaseTestCase {
         userState.url = "http://localhost:6571/find-in-page-test.html"
         openFindInPageFromMenu()
 
-      //  loadWebPage("http://www.angelfire.com/falcon/flamingchickens/abcd.html", waitForLoadToFinish: false)
-
         // Enter some text to start finding
         app.textFields[""].typeText("Book")
 
-        // @TODO add these in once code lands
-//        waitforExistence(app.staticTexts["1/500+"])
-//        XCTAssertTrue(app.staticTexts["1/500+"].exists)
+        waitforExistence(app.staticTexts["1/500+"])
+        XCTAssertTrue(app.staticTexts["1/500+"].exists)
     }
 
     func testFindFromMenu() {
