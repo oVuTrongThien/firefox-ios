@@ -39,7 +39,7 @@ class HistoryTests: BaseTestCase {
 
         // Go to History List from Browser context menu and there should be one entry
         waitforExistence(app.tables.cells["HistoryPanel.recentlyClosedCell"])
-        XCTAssertTrue(app.tables.otherElements.staticTexts["Today"].exists)
+        //XCTAssertTrue(app.tables.otherElements.staticTexts["Today"].exists)
         XCTAssertTrue(app.tables.cells.staticTexts[webpage["label"]!].exists)
     }
 

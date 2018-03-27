@@ -11,7 +11,8 @@ let allDefaultTopSites = ["facebook", "youtube", "amazon", "wikipedia", "twitter
 class ActivityStreamTest: BaseTestCase {
     let TopSiteCellgroup = XCUIApplication().collectionViews.cells["TopSitesCell"]
 
-    let testWithDB = ["testActivityStreamPages"]
+    let testWithDB = ["testActivityStreamPages","testTopSitesAdd", "testTopSitesOpenInNewTab", "testTopSitesOpenInNewPrivateTab", "testTopSitesBookmarkNewTopSite", "testTopSitesShareNewTopSite", "testContextMenuInLandscape"]
+
     let pagesVisitediPad = "browserActivityStreamPagesiPad.db"
     let pagesVisitediPhone = "browserActivityStreamPagesiPhone.db"
 
@@ -40,16 +41,12 @@ class ActivityStreamTest: BaseTestCase {
     }
 
     func testTopSitesAdd() {
-        checkNumberOfExpectedTopSites(numberOfExpectedTopSites: 5)
-
-        loadWebPage("http://example.com")
-        if iPad() {
-            app.buttons["URLBarView.backButton"].tap()
-        } else {
-            app.buttons["TabToolbar.backButton"].tap()
-        }
         navigator.goto(URLBarOpen)
-        checkNumberOfExpectedTopSites(numberOfExpectedTopSites: 6)
+        if iPad() {
+            checkNumberOfExpectedTopSites(numberOfExpectedTopSites: 12)
+        } else {
+            checkNumberOfExpectedTopSites(numberOfExpectedTopSites: 8)
+        }
     }
 
     func testTopSitesRemove() {
@@ -70,7 +67,7 @@ class ActivityStreamTest: BaseTestCase {
     }
 
     func testTopSitesRemoveDefaultTopSite() {
-     TopSiteCellgroup.cells[defaultTopSite["topSiteLabel"]!].press(forDuration: 1)
+        TopSiteCellgroup.cells[defaultTopSite["topSiteLabel"]!].press(forDuration: 1)
 
         // Tap on Remove and check that now there should be only 4 default top sites
         selectOptionFromContextMenu(option: "Remove")
@@ -153,36 +150,19 @@ class ActivityStreamTest: BaseTestCase {
     }
 
     func testTopSitesOpenInNewTab() {
-        loadWebPage("http://example.com")
-        if iPad() {
-            app.buttons["URLBarView.backButton"].tap()
-        } else {
-            app.buttons["TabToolbar.backButton"].tap()
-        }
-        navigator.goto(URLBarOpen)
-        TopSiteCellgroup.cells["example"].press(forDuration: 1)
+        navigator.goto(HomePanelsScreen)
+        TopSiteCellgroup.cells["apple"].press(forDuration: 1)
         app.tables["Context Menu"].cells["Open in New Tab"].tap()
         XCTAssert(TopSiteCellgroup.exists)
-        XCTAssertFalse(app.staticTexts["example"].exists)
+        XCTAssertFalse(app.staticTexts["apple"].exists)
 
-        //URLBarview goBack button
-        let goBackButton = app.children(matching: .window).element(boundBy: 0).children(matching: .other).element.children(matching: .other).element.children(matching: .other).element.children(matching: .other).element.children(matching: .other).element(boundBy: 1).children(matching: .other).element.children(matching: .button).element(boundBy: 0)
-        goBackButton.tap()
-
-        if iPad() {
-            app.buttons["TopTabsViewController.tabsButton"].tap()
-        } else {
-            app.buttons["TabToolbar.tabsButton"].tap()
-        }
-
-        app.cells.element(boundBy: 0).tap() //"Example Domain"
-        XCTAssertFalse(app.tables["Top sites"].exists)
-
-        let staticTextsQuery = self.app.staticTexts.matching(identifier: "Example Domain")
-        if staticTextsQuery.count > 0 {
-            let firstText = staticTextsQuery.element(boundBy: 0)
-            XCTAssert(firstText.exists)
-        }
+        navigator.goto(TabTray)
+        app.collectionViews.cells["home"].tap()
+        waitforExistence(TopSiteCellgroup.cells["apple"])
+        navigator.nowAt(HomePanelsScreen)
+        navigator.goto(TabTray)
+        waitforExistence(app.collectionViews.cells["Apple"])
+        XCTAssertTrue(app.collectionViews.cells["Apple"].exists, "A new Tab has not been open")
     }
 
     func testTopSitesOpenInNewTabDefaultTopSite() {
@@ -200,33 +180,21 @@ class ActivityStreamTest: BaseTestCase {
     }
 
     func testTopSitesOpenInNewPrivateTab() {
-        loadWebPage("http://example.com")
-        if iPad() {
-            app.buttons["URLBarView.backButton"].tap()
-        } else {
-            app.buttons["TabToolbar.backButton"].tap()
-        }
-        navigator.goto(URLBarOpen)
-        app.collectionViews.cells["TopSitesCell"].cells["example"].press(forDuration: 1)
+        navigator.goto(HomePanelsScreen)
+        waitforExistence(app.collectionViews.cells["TopSitesCell"].cells["apple"])
+        app.collectionViews.cells["TopSitesCell"].cells["apple"].press(forDuration: 1)
         app.tables["Context Menu"].cells["Open in New Private Tab"].tap()
 
         XCTAssert(TopSiteCellgroup.exists)
-        XCTAssertFalse(app.staticTexts["example"].exists)
+        XCTAssertFalse(app.staticTexts["Apple"].exists)
 
-        //URLBarview goBack button
-        let goBackButton = app.children(matching: .window).element(boundBy: 0).children(matching: .other).element.children(matching: .other).element.children(matching: .other).element.children(matching: .other).element.children(matching: .other).element(boundBy: 1).children(matching: .other).element.children(matching: .button).element(boundBy: 0)
-        goBackButton.tap()
-        if iPad() {
-            app.buttons["TopTabsViewController.tabsButton"].tap()
-        } else {
-            app.buttons["TabToolbar.tabsButton"].tap()
-        }
-
-        app.buttons["TabTrayController.maskButton"].tap()
-        app.cells["Example Domain"].tap()
+        navigator.toggleOn(userState.isPrivate, withAction: Action.TogglePrivateMode)
+        //app.buttons["TabTrayController.maskButton"].tap()
+        navigator.goto(TabTray)
+        app.cells["Apple"].tap()
 
         XCTAssertFalse(TopSiteCellgroup.exists)
-        XCTAssert(app.staticTexts["Example Domain"].exists)
+        XCTAssert(app.staticTexts["Apple"].exists)
     }
 
     func testTopSitesOpenInNewPrivateTabDefaultTopSite() {
@@ -266,14 +234,6 @@ class ActivityStreamTest: BaseTestCase {
     }
 
     func testTopSitesBookmarkNewTopSite () {
-        // Bookmark a new TopSite
-        navigator.openURL(newTopSite["url"]!)
-        waitUntilPageLoad()
-        if iPad() {
-            app.buttons["URLBarView.backButton"].tap()
-        } else {
-            app.buttons["TabToolbar.backButton"].tap()
-        }
         let topSiteCells = TopSiteCellgroup.cells
         waitforExistence(topSiteCells[newTopSite["topSiteLabel"]!])
         topSiteCells[newTopSite["topSiteLabel"]!].press(forDuration: 1)
@@ -306,9 +266,6 @@ class ActivityStreamTest: BaseTestCase {
     }
 
     func testTopSitesShareNewTopSite () {
-        navigator.openURL(newTopSite["url"]!)
-        waitUntilPageLoad()
-        navigator.goto(TabTray)
         navigator.goto(HomePanelsScreen)
         let topSiteCells = TopSiteCellgroup.cells
         waitforExistence(topSiteCells[newTopSite["topSiteLabel"]!])
@@ -364,14 +321,7 @@ class ActivityStreamTest: BaseTestCase {
     func testContextMenuInLandscape() {
         XCUIDevice.shared().orientation = .landscapeLeft
 
-        navigator.openURL("http://example.com")
-        waitUntilPageLoad()
-        if app.buttons["URLBarView.backButton"].isEnabled {
-            app.buttons["URLBarView.backButton"].tap()
-        } else {
-            app.textFields["url"].tap()
-        }
-        TopSiteCellgroup.cells["example"].press(forDuration: 1)
+        TopSiteCellgroup.cells["apple"].press(forDuration: 1)
 
         let contextMenuHeight = app.tables["Context Menu"].frame.size.height
         let parentViewHeight = app.otherElements["Action Sheet"].frame.size.height
