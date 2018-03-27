@@ -29,12 +29,12 @@ class ReadingListStorageTestCase: XCTestCase {
         case .failure(let error):
             XCTFail(error.description)
         case .success(let result):
-            XCTAssertEqual(result.value.url, "http://www.anandtech.com/show/9117/analyzing-intel-core-m-performance")
-            XCTAssertEqual(result.value.title, "Analyzing Intel Core M Performance: How 5Y10 can beat 5Y71 & the OEMs' Dilemma")
-            XCTAssertEqual(result.value.addedBy, "Stefan's iPhone")
-            XCTAssertEqual(result.value.unread, true)
-            XCTAssertEqual(result.value.archived, false)
-            XCTAssertEqual(result.value.favorite, false)
+            XCTAssertEqual(result.url, "http://www.anandtech.com/show/9117/analyzing-intel-core-m-performance")
+            XCTAssertEqual(result.title, "Analyzing Intel Core M Performance: How 5Y10 can beat 5Y71 & the OEMs' Dilemma")
+            XCTAssertEqual(result.addedBy, "Stefan's iPhone")
+            XCTAssertEqual(result.unread, true)
+            XCTAssertEqual(result.archived, false)
+            XCTAssertEqual(result.favorite, false)
         }
     }
 
@@ -123,7 +123,7 @@ class ReadingListStorageTestCase: XCTestCase {
         case .failure(let error):
             XCTFail(error.description)
         case .success(let result):
-            XCTAssert(result.value == nil)
+            XCTAssert(result == nil)
         }
     }
 
